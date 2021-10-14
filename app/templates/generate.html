@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block header %}
+        <style>
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="px-4 py-5 my-5 text-center">
+    <img class="d-block mx-auto mb-4" src="{{ url_for('static', filename='images/muzik.jpeg')}}" alt="" width="72" height="57">
+    <h1 class="display-5 fw-bold">What's Your Music Taste?</h1>
+    <div class="col-lg-6 mx-auto">
+      <p class="lead mb-4">Enter the URL to your favorite playlist and we'll show you your taste!</p>
+      <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.playlist.label }}<br>
+                {{ form.playlist(size=32) }}<br>
+                {% for error in form.playlist.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            <p>{{ form.submit() }}</p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="b-example-divider"></div>
+{% endblock %}
