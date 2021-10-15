@@ -114,5 +114,5 @@ def playlist(playlist_id):
 
     plt.xticks(angles[:-1], categories, size=15)
     plt.yticks(color='grey', size=15)
-    plt.savefig('app/static/images/new_plot.png')
+    plt.savefig('app/static/images/new_plot.svg')
     plt.close()
