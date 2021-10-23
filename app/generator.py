@@ -31,36 +31,13 @@ def playlist(playlist_id):
         track = item['track']['id']
         ids.append(track)
 
-    song_meta = {'id': [], 'album': [], 'name': [],
-                 'artist': [], 'explicit': [], 'popularity': []}
+    song_meta = {'id': []}
 
     for song_id in ids:
         # get song's meta data
         meta = sp.track(song_id)
-
         # song id
         song_meta['id'].append(song_id)
-
-        # album name
-        album = meta['album']['name']
-        song_meta['album'] += [album]
-
-        # song name
-        song = meta['name']
-        song_meta['name'] += [song]
-
-        # artists name
-        s = ', '
-        artist = s.join([singer_name['name'] for singer_name in meta['artists']])
-        song_meta['artist'] += [artist]
-
-        # explicit: lyrics could be considered offensive or unsuitable for children
-        explicit = meta['explicit']
-        song_meta['explicit'].append(explicit)
-
-        # song popularity
-        popularity = meta['popularity']
-        song_meta['popularity'].append(popularity)
 
     song_meta_df = pd.DataFrame.from_dict(song_meta)
 
@@ -68,19 +45,13 @@ def playlist(playlist_id):
     features = sp.audio_features(song_meta['id'])
     # change dictionary to dataframe
     features_df = pd.DataFrame.from_dict(features)
-
-    # convert milliseconds to mins
-    # duration_ms: The duration of the track in milliseconds.
-    # 1 minute = 60 seconds = 60 × 1000 milliseconds = 60,000 ms
-    features_df['duration_ms'] = features_df['duration_ms'] / 60000
-
     # combine two dataframe
     final_df = song_meta_df.merge(features_df)
 
     # average value for each category
 
-    music_feature = features_df[['danceability', 'energy', 'loudness', 'speechiness', 'acousticness',
-                                 'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms']]
+    music_feature = features_df[['danceability', 'energy', 'loudness', 'acousticness',
+                                 'liveness', 'valence', 'tempo']]
 
     # make sure error message isn't there anymore
     pd.options.mode.chained_assignment = None
