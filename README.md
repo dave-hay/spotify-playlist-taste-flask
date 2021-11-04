@@ -1,8 +1,8 @@
 # Spotify Playlist Taste Visualized
 <hr>
-Recently I created my very first web app and only a mere month and a half ago I was just learning how to print 'Hello, world!'. I was drawn to programming because I started to see that every platform I used had an API (Application Programming Interface) and I just knew that something what behind that and curiosity got the best of me. I checked out Spotify's API and 
 
-While still a newbie in the world of programming every day I see more and more possibilities and continually get less frustrated (that might be a lie). But, I'm proud of my project and wanted to share it with others who are interested in doing something similar.
+Check it out!
+https://spotify-playlist-taste.herokuapp.com
 
 ### Overview
 
