@@ -1,6 +1,6 @@
-"""This is a program to take a playlist and create a plot of it"""
-
 # Standard Library Imports
+import base64
+import io
 import os
 
 # Third party imports
@@ -25,65 +25,54 @@ def playlist(playlist_id):
     playlist_id = playlist_id
     results = sp.playlist(playlist_id)
 
-    ids = []
-
+    ids = {'id': []}
     for item in results['tracks']['items']:
         track = item['track']['id']
-        ids.append(track)
+        ids['id'].append(track)
 
-    song_meta = {'id': []}
+    """
+    def create_song_meta_list(ids):
+        song_meta = {'id': []}
+        for song_id in ids:
+            song_meta['id'].append(song_id)
+    """
 
-    for song_id in ids:
-        # get song's meta data
-        meta = sp.track(song_id)
-        # song id
-        song_meta['id'].append(song_id)
-
-    song_meta_df = pd.DataFrame.from_dict(song_meta)
-
+    song_meta_df = pd.DataFrame.from_dict(ids)
     # check the song feature
-    features = sp.audio_features(song_meta['id'])
+    features = sp.audio_features(ids['id'])
     # change dictionary to dataframe
     features_df = pd.DataFrame.from_dict(features)
-    # combine two dataframe
-    final_df = song_meta_df.merge(features_df)
-
-    # average value for each category
-
-    music_feature = features_df[['danceability', 'energy', 'loudness', 'acousticness',
+    m_feature = features_df[['danceability', 'energy', 'loudness', 'acousticness',
                                  'liveness', 'valence', 'tempo']]
 
-    # make sure error message isn't there anymore
-    pd.options.mode.chained_assignment = None
-    min_max_scaler = MinMaxScaler()
-    music_feature.loc[:] = min_max_scaler.fit_transform(music_feature.loc[:])
+    def scale(mf_df):
+        music_feature = mf_df
+        # make sure error message isn't there anymore
+        pd.options.mode.chained_assignment = None
+        min_max_scaler = MinMaxScaler()
+        music_feature.loc[:] = min_max_scaler.fit_transform(music_feature.loc[:])
+        return music_feature
 
-    # plot size
-    fig = plt.figure(figsize=(12, 8))
+    def plot_features(music_feature):
+        plt.figure(figsize=(12, 8))
+        categories = list(music_feature.columns)  # list of column names
+        cat_len = len(categories)  # convert column names into a list
+        value = list(music_feature.mean())  # list with average of all features
+        value += value[:1]
+        angles = [n / float(cat_len) * 2 * np.pi for n in range(cat_len)]
+        angles += angles[:1]
+        plt.polar(angles, value)
+        plt.fill(angles, value, alpha=0.3)
+        plt.xticks(angles[:-1], categories, size=15)
+        plt.yticks(color='grey', size=15)
+        # save image to base64
+        my_stringIObytes = io.BytesIO()
+        my_stringIObytes.truncate(0)
+        plt.savefig(my_stringIObytes, format='jpg')
+        my_stringIObytes.seek(0)
+        my_base64_jpgData = base64.b64encode(my_stringIObytes.read())
+        plt.close()
+        return my_base64_jpgData
 
-    # convert column names into a list
-    categories = list(music_feature.columns)
-    # number of categories
-    N = len(categories)
-
-    # create a list with the average of all features
-    value = list(music_feature.mean())
-
-    # repeat first value to close the circle
-    # the plot is a circle, so we need to "complete the loop"
-    # and append the start value to the end.
-    value += value[:1]
-    # calculate angle for each category
-    angles = [n / float(N) * 2 * np.pi for n in range(N)]
-    angles += angles[:1]
-
-    # plot
-    plt.polar(angles, value)
-    plt.fill(angles, value, alpha=0.3)
-
-    # plt.title('Discovery Weekly Songs Audio Features', size=35)
-
-    plt.xticks(angles[:-1], categories, size=15)
-    plt.yticks(color='grey', size=15)
-    plt.savefig('app/static/images/new_plot.svg')
-    plt.close()
+    mf_scale = scale(m_feature)
+    return plot_features(mf_scale)

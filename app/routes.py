@@ -10,8 +10,8 @@ def generate():
     form = PlaylistEntry()
     if form.validate_on_submit():
         playlist_id = form.playlist.data
-        playlist(playlist_id)
-        return redirect(url_for('results'))
+        encode_img = playlist(playlist_id)
+        return render_template('results.html', img_data=encode_img.decode('utf-8'))
     return render_template('generate.html', form=form)
 
 

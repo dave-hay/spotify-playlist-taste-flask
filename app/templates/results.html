@@ -2,6 +2,6 @@
 
 {% block content %}
     <div>
-        <img src="{{ url_for('static', filename='images/new_plot.svg') }}" class="img-fluid" alt="Responsive image">
+        <img id="picture" src="data:image/jpeg;base64,{{ img_data }}" class="img-fluid" alt="Responsive image">
     </div>
 {% endblock %}
